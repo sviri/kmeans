@@ -24,8 +24,7 @@
 
 %\linespread{1.6}
 \newcommand{\ignore}[1]{}
-\newcommand{\kmpp}{$k$-means++ }
-\newcommand{\kmeans}{$k$-means}
+
 \newtheorem{theorem}{Theorem}
 \newtheorem{fact}{Fact}
 \newtheorem{conjecture}{Conjecture}
@@ -63,21 +62,21 @@
 \maketitle{}
 \mbox{}
 \begin{abstract}
-This paper shows that one can be competitive with with the \kmeans objective while operating online.
+This paper shows that one can be competitive with with the $k$-means objective while operating online.
 In this model, the algorithm receives vectors $v_1,\ldots,v_n$ one by one in arbitrary order. 
 For each vector $v_i$ the algorithm outputs a cluster identifier before receiving $v_{i+1}$.
-Our online algorithm generates $\tilde{O}(k)$ clusters whose \kmeans cost is $\tilde{O}(W^*)$ where $W^*$ is the optimal \kmpp cost using $k$ clusters.\footnote{The notation $\tilde{O}(\cdot)$ depresses poly-logarithmic factors.}
-We also show that, experimentally, it is not much worse than \kmpp while operating in a strictly more constrained computational model.
+Our online algorithm generates $\tilde{O}(k)$ clusters whose $k$-means cost is $\tilde{O}(W^*)$ where $W^*$ is the optimal $k$-means cost using $k$ clusters.\footnote{The notation $\tilde{O}(\cdot)$ depresses poly-logarithmic factors.}
+We also show that, experimentally, it is not much worse than $k$-means++ while operating in a strictly more constrained computational model.
 \end{abstract}
 \section{Introduction}
 
-One of the basic and well-studied optimization models in unsupervised Machine Learning is \kmeans clustering. In this problem we are given the set $V$ of $n$ points (or vectors) in $R^m$. The goal is to partition $V$ into $k$ sets called clusters $C_1,\dots, C_k$ and choose one point $z_i\in R^m$ for each cluster $C_i$ to minimize 
+One of the basic and well-studied optimization models in unsupervised Machine Learning is $k$-means clustering. In this problem we are given the set $V$ of $n$ points (or vectors) in $R^m$. The goal is to partition $V$ into $k$ sets called clusters $C_1,\dots, C_k$ and choose one point $z_i\in R^m$ for each cluster $C_i$ to minimize 
 $$\sum_{i=1}^{k} \sum_{x\in C_i} ||x-z_i||_2^2.$$
 
 In the offline setting where the set of all points is known in advance, Lloyd's algorithm \cite{Lloyd82} provides popular heuristics. 
-It is so popular that practitioners often simply refer to it as \kmpp. 
+It is so popular that practitioners often simply refer to it as $k$-means. 
 Yet, only recently some theoretical guaranties were proven for its performance on ``well clusterable" inputs \cite{OstrovskyRSS12}.
-The \kmpp \cite{ArthurV07} algorithm provides an expected  $O(\log(k))$ approximation or an efficient seeding algorithm. 
+The $k$-means++ \cite{ArthurV07} algorithm provides an expected  $O(\log(k))$ approximation or an efficient seeding algorithm. 
 A well know theoretical algorithm is due to Kanungo et al. \cite{KanungoMNPSW02}. 
 It gives a constant approximation ratio and is based on local search ideas popular in the related area of design and analysis of algorithms for facility location problems (e.g. \cite{AryaGKMMP04}).
 
@@ -85,7 +84,7 @@ It gives a constant approximation ratio and is based on local search ideas popul
 %In recent years there has been a lot of focus on streaming and online models of computation driven in large part by the explosion in data. 
 %In the streaming model an algorithm has to process and discard a point after a small number of (typically one) passes. 
 In the standard streaming model the algorithm must consume the date in one pass and is allowed to keep only a small (typically constant or logarithmic) amount of information. 
-Nevertheless, it must output its final decisions when the stream has ended. For example, the location of the centers for \kmpp
+Nevertheless, it must output its final decisions when the stream has ended. For example, the location of the centers for $k$-means.
 Such model was considered by Ailon et al. \cite{AilonJM09}. In such a model, the best assignment of points to the centers chosen by the algorithm is only known in hindsight.
 
 In contrast, the online model of computation does not allow to postpone clustering decisions. 
@@ -107,17 +106,17 @@ If the online algorithm puts $x_1$ and $x_2$ in the same cluster it exhibits cos
 
 
 
-In the context of machine learning, the results of \kmeans were shown to provide powerful unsupervised features \cite{CoatesNL11} on par, sometimes, with neural nets for example.
+In the context of machine learning, the results of $k$-means were shown to provide powerful unsupervised features \cite{CoatesNL11} on par, sometimes, with neural nets for example.
 This is often referred to as (unsupervised) feature learning.
 Intuitively, if the clustering captures most of the variability in the data, assigning a single label to an entire cluster should be pretty accurate.
 It is not surprising therefore that cluster labels are powerful features for classification. 
 In the case of online machine learning, these cluster labels must be assigned online.
-The importance of such an online \kmeans model was already recognized in machine learning community \cite{ChoromanskaM12, DasguptaCSE291}.  
+The importance of such an online $k$-means model was already recognized in machine learning community \cite{ChoromanskaM12, DasguptaCSE291}.  
 
 A closely related family of optimization problems is known as facility location problems. Two standard variants are the uncapacitated facility location problem (or the simple plant location problem in the Operations Research jargon) and the k-median problem. These problems are well-studied both from computational and theoretic viewpoints (a book \cite{drezner2004facility} and a survey \cite{Vygen05} provide the  background on some of the aspects in this area). Meyerson \cite{Meyerson01} suggested a simple and elegant algorithm for the online uncapacitated facility location with competitive ratio of $O(\log n)$. Fotakis \cite{Fotakis08} suggested a primal-dual algorithm with better performance guarantee of $O(\log n/\log \log n)$. Anagnostopoulos et al. \cite{AilonJM09} considered a different set of algorithms based on hierarchical partitioning of the space and obtained similar competitive ratios. The survey \cite{Fotakis11} summarizes the results in this area.
 
-In this work we consider two online \kmeans models. In the {\it semi-online} model we assume that we know the total number of vectors that we are going to process. 
-And, a lower bound $w^*$ for the total optimal cost of \kmeans $W^*$. 
+In this work we consider two online $k$-means models. In the {\it semi-online} model we assume that we know the total number of vectors that we are going to process. 
+And, a lower bound $w^*$ for the total optimal cost of $k$-means $W^*$. 
 We design an algorithm (Algorithm~\ref{alg3}) that finds an approximate solution with at most $O(k\log n \log (W^*/w^*))$ clusters in expectation and has objective value at most constant times the optimal value of the optimal offline solution for the $k$-means problem (in expectation). 
 
 In the pure online model we do not assume any prior knowledge.
@@ -131,7 +130,7 @@ The performance of the semi-online algorithm will degrade significantly only if 
 \section{Online and Semi-Online Algorithms for $k$-means}\label{alg}
 
 The algorithm uses ideas from the online facility location algorithm of Meyerson \cite{Meyerson01}.
-The intuition is as follows; think about \kmeans and a facility location problem where the service costs are squared Euclidean distances.
+The intuition is as follows; think about $k$-means and a facility location problem where the service costs are squared Euclidean distances.
 For the facility cost, start with $f_1$ which is known to be too low. 
 By doing that the algorithm is ``encouraged" to open many facilities (centers) which keeps the service costs low.
 If the algorithm detect that too many facilities were opened, it can conclude that the current facility cost is too low. 
@@ -352,7 +351,7 @@ This is a heuristic ad-hoc conversion that compensates for the $k_{actual}$ bein
 	\ENDIF
 \ENDFOR
 \STATE $k_{actual} \gets |C|$
-\caption{Heuristic online \kmeans, practical but unprovable.}\label{alg2}
+\caption{Heuristic online $k$-means, practical but unprovable.}\label{alg2}
 \end{algorithmic}
 \end{algorithm}
 
@@ -388,7 +387,7 @@ The column under ``sparse?'' simply indicates whether $nnz$ is much smaller that
 \end{table}%
 
 \subsection{The number of online clusters}
-One of the artifacts of applying our online \kmeans algorithm is that the number of clusters is not exactly known a priory.
+One of the artifacts of applying our online $k$-means algorithm is that the number of clusters is not exactly known a priory.
 But as we see in Figure~\ref{fig1}, the number of resulting clusters is rather predictable and controllable.
 Figure~\ref{fig1} gives the ratio between the number of clusters outputted by the algorithm, $k_{actual}$, and the specified target $k_{target}$.
 The results reported are mean values of $3$ runs for every parameter setting. 
@@ -408,16 +407,16 @@ We clearly see that this ratio is roughly constant and close $1$. Interestingly,
 \end{figure}
 
 \subsection{Online clustering cost}
-Throughout this section, we measure the online \kmeans clustering cost with respect to different baselines. We report averages of at least 3 different independent executions for every parameter setting.
-In Figure~\ref{fig2} the reader can see the online \kmeans clustering cost for the set of centers chosen online by our algorithm for different values of $k_{target}$ and different datasets.
-For normalization, each cost is divided by $f_0$, the sum of squares of all vector norms in the dataset (akin to the theoretical \kmeans cost of having one center at the origin).
-Note that some datasets are inherently unclusterable. Even using many cluster centers, the \kmeans objective does not decrease substantially.
-Nevertheless, as expected, the \kmeans cost obtained by the online algorithm, $f_{online}$, decreases as a function of $k_{target}$. 
+Throughout this section, we measure the online $k$-means clustering cost with respect to different baselines. We report averages of at least 3 different independent executions for every parameter setting.
+In Figure~\ref{fig2} the reader can see the online $k$-means clustering cost for the set of centers chosen online by our algorithm for different values of $k_{target}$ and different datasets.
+For normalization, each cost is divided by $f_0$, the sum of squares of all vector norms in the dataset (akin to the theoretical $k$-means cost of having one center at the origin).
+Note that some datasets are inherently unclusterable. Even using many cluster centers, the $k$-means objective does not decrease substantially.
+Nevertheless, as expected, the $k$-means cost obtained by the online algorithm, $f_{online}$, decreases as a function of $k_{target}$. 
 
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics{figures/plot2.pdf}
-\caption{Online \kmeans clustering cost ($f_{online}$) as a sanction of $k_{target}$ for the different datasets.
+\caption{Online $k$-means clustering cost ($f_{online}$) as a sanction of $k_{target}$ for the different datasets.
 For normalization, each cost is divided by $f_0$, the sum of squares of all vector norms in the dataset (akin to the $k$-cost of once center in the origin).}
 \label{fig2}
 \end{center}
@@ -426,9 +425,9 @@ For normalization, each cost is divided by $f_0$, the sum of squares of all vect
 The monotonicity of $f_{online}$ with respect to $k_{target}$ is unsurprising.
 In Figure~\ref{fig3} we plot the ratio $f_{online}/f_{random}$ as a function of $k_{target}$.
 Here, $f_{random}$ is the sum of squared distances of input points to $k_{actual}$  input points chosen uniformly at random (as centers).
-Note that in each experiment the number of clusters used by the random solution and online \kmeans is identical, namely, $k_{actual}$.
+Note that in each experiment the number of clusters used by the random solution and online $k$-means is identical, namely, $k_{actual}$.
 Figure~\ref{fig3} illustrates something surprising. The ratio between the costs remains relatively fixed per dataset and almost independent to $k_{target}$.
-Put differently, even when the \kmeans cost is significantly lower than picking $k$ random centers, they improve in similar rates as $k$ grows.
+Put differently, even when the $k$-means cost is significantly lower than picking $k$ random centers, they improve in similar rates as $k$ grows.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -440,13 +439,13 @@ A surprising observation is that this ratio is almost constant for each dataset 
 \end{center}
 \end{figure}
 
-The next experiment compares online \kmeans to \kmeans++.
-For every value of $k_{target}$ we ran online \kmeans to obtain both $f_{online}$ and $k_{actual}$.
-Then, we invoked \kmeans++ using $k_{actual}$ many clusters and computed its cost, $f_{kmpp}$.
+The next experiment compares online $k$-means to $k$-means++.
+For every value of $k_{target}$ we ran online $k$-means to obtain both $f_{online}$ and $k_{actual}$.
+Then, we invoked $k$-means++ using $k_{actual}$ many clusters and computed its cost, $f_{kmpp}$.
 This experiment was repeated $3$ times for each dataset and each value of $k_{target}$.
 The mean results are reported in Figure~\ref{fig4}. 
-Unsurprisingly, \kmeans++ is usually better in terms of cost. But, the reader should keep in mind that
-\kmeans++ is an \emph{offline} algorithm that requires $k$ passes over the data compared with the online computational model of our algorithm.
+Unsurprisingly, $k$-means++ is usually better in terms of cost. But, the reader should keep in mind that
+$k$-means++ is an \emph{offline} algorithm that requires $k$ passes over the data compared with the online computational model of our algorithm.
 
 
 
@@ -454,8 +453,8 @@ Unsurprisingly, \kmeans++ is usually better in terms of cost. But, the reader sh
 \begin{center}
 \includegraphics{figures/plot4.pdf}
 \caption{On the $y$-axis we plot $f_{online}/f_{kmpp}$ as a function of $k_{target}$ on the $x$-axis. The values of $f_{online}$ is the cost of running Algorithm~\ref{alg2} with parameter $k_{target}$.
-The value of $f_{kmpp}$ is the cost of running \kmeans++ with $k_{actual}$ clusters, $k_{actual}$ is the number of clusters online \kmeans actually used.
-We see that, except for the datasets \emph{adult} and \emph{shuttle.binary}, \kmeans++ and online \kmeans are comparable. For \emph{adult} and \emph{shuttle.binary} online \kmeans is worse by a small constant factor. Note (Figure~\ref{fig3}) that both \emph{adult} and \emph{shuttle.binary} are datasets for which online $k$ means is dramatically better than random.}
+The value of $f_{kmpp}$ is the cost of running $k$-means++ with $k_{actual}$ clusters, $k_{actual}$ is the number of clusters online $k$-means actually used.
+We see that, except for the datasets \emph{adult} and \emph{shuttle.binary}, $k$-means++ and online $k$-means are comparable. For \emph{adult} and \emph{shuttle.binary} online $k$-means is worse by a small constant factor. Note (Figure~\ref{fig3}) that both \emph{adult} and \emph{shuttle.binary} are datasets for which online $k$ means is dramatically better than random.}
 \label{fig4}
 \end{center}
 \end{figure}
@@ -464,10 +463,10 @@ We see that, except for the datasets \emph{adult} and \emph{shuttle.binary}, \km
 \begin{center}
 \includegraphics{figures/plot5.pdf}
 \caption{On the $x$-axis $f_{kmpp}/f_{random}$ both using $k_{actual}$ clusters. 
-The value of $k_{actual}$ is obtained by running online \kmeans with input $k_{target}$ on the $x$-axis.
+The value of $k_{actual}$ is obtained by running online $k$-means with input $k_{target}$ on the $x$-axis.
 The $y$-axis depicts $f_{online}/f_{random}$. 
-Note that the performance of \kmeans++ and online \kmeans are very similar almost everywhere.
-The advantage of \kmeans++ (see Figure~\ref{fig4}) occurs when the clustering cost is a minuscule fraction of random clustering.}
+Note that the performance of $k$-means++ and online $k$-means are very similar almost everywhere.
+The advantage of $k$-means++ (see Figure~\ref{fig4}) occurs when the clustering cost is a minuscule fraction of random clustering.}
 \label{fig5}
 \end{center}
 \end{figure}
@@ -491,7 +490,7 @@ We would like to thank  Dean Foster for  helping us with the proof of the Lemma 
 
 
 
-\section{Online and Semi-Online Algorithms for \kmeans}\label{alg}
+\section{Online and Semi-Online Algorithms for $k$-means}\label{alg}
 
 Our algorithm will run in phases, the phases will be indexed by $r\ge 1$. On each phase  let $f_r$ denote the parameter used as a cost gauge for opening a new cluster. Initially $f_1$ is defined to be the smallest non-zero squared distance between two vectors in our problem instance and $f_r=2\cdot f_{r-1}$ for $r\ge 2$.
 The total number of demand points (or vectors) is $n$.  Each input vector is indexed by  $j=1,\dots,n$. 
