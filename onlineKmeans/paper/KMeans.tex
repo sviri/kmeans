@@ -110,14 +110,14 @@ In the context of machine learning, the results of $k$-means were shown to provi
 This is often referred to as (unsupervised) feature learning.
 Intuitively, if the clustering captures most of the variability in the data, assigning a single label to an entire cluster should be pretty accurate.
 It is not surprising therefore that cluster labels are powerful features for classification. 
-In the case of online machine learning, these cluster labels must be assigned online.
+In the case of online machine learning, these cluster labels must also be assigned online.
 The importance of such an online $k$-means model was already recognized in machine learning community \cite{ChoromanskaM12, DasguptaCSE291}.  
 
 A closely related family of optimization problems is known as facility location problems. Two standard variants are the uncapacitated facility location problem (or the simple plant location problem in the Operations Research jargon) and the k-median problem. These problems are well-studied both from computational and theoretic viewpoints (a book \cite{drezner2004facility} and a survey \cite{Vygen05} provide the  background on some of the aspects in this area). Meyerson \cite{Meyerson01} suggested a simple and elegant algorithm for the online uncapacitated facility location with competitive ratio of $O(\log n)$. Fotakis \cite{Fotakis08} suggested a primal-dual algorithm with better performance guarantee of $O(\log n/\log \log n)$. Anagnostopoulos et al. \cite{AilonJM09} considered a different set of algorithms based on hierarchical partitioning of the space and obtained similar competitive ratios. The survey \cite{Fotakis11} summarizes the results in this area.
 
 In this work we consider two online $k$-means models. In the {\it semi-online} model we assume that we know the total number of vectors that we are going to process. 
 And, a lower bound $w^*$ for the total optimal cost of $k$-means $W^*$. 
-We design an algorithm (Algorithm~\ref{alg3}) that finds an approximate solution with at most $O(k\log n \log (W^*/w^*))$ clusters in expectation and has objective value at most constant times the optimal value of the optimal offline solution for the $k$-means problem (in expectation). 
+We design an algorithm (Algorithm~\ref{alg3}) that finds an approximate solution with at most $O(k\log n \log (W^*/w^*))$ clusters in expectation and has an expected objective value $O(W^*)$.
 
 In the pure online model we do not assume any prior knowledge.
 Our algorithm (Algorithm~\ref{alg1}) opens a comparable number of clusters as in the semi-online model but the objective function quality of the solution could be worse by a $\log n$-factor. 
@@ -174,7 +174,7 @@ As a convention, if $C = \emptyset$ then $D(v, C) = \infty$ for any $v$.
 		\STATE $r \gets r+1$;\;\;  $f_r \gets 2\cdot f_{r-1}$;\;\; $q_r \gets 0$
 	\ENDIF
 \ENDFOR
-\caption{Fully online $k$-means algorithm}\label{alg1}
+\caption{Online $k$-means algorithm}\label{alg1}
 \end{algorithmic}
 \end{algorithm}
 
@@ -338,11 +338,13 @@ This is a heuristic ad-hoc conversion that compensates for the $k_{actual}$ bein
 \STATE {\bf input:} $k_{target}$,  $v_1,\ldots,v_n$
 \STATE $C \gets \emptyset$;\;\; $r \gets 1$;\;\; $q_1 \gets 0$
 \STATE $k \gets \lceil(k_{target}-15)/5\rceil$
-\FOR {$i \in 1,\ldots, k+10$}
+\STATE $k' \gets k+10$
+\FOR {$i \in 1,\ldots, k'$}
 	\STATE \tab $C \gets C \cup \{v_i\}$
 \ENDFOR
-\STATE $f_r\gets$ half the sum of the $10$ smallest distance out of possible ${k+10 \choose 2}$ in $C$.
-\FOR {$i \in k+11,\ldots, n$}
+\STATE $D_{\min} = \{D^2(v_i,C \setminus \{i\}) | v_i \in C\}$
+\STATE $f_r\gets$ half the sum of the $k'-k$ smallest elements in $D_{\min}$.
+\FOR {$i \in k'+1,\ldots, n$}
 	\STATE {\bf with probability} $p_i = \min(D^2(v_i, C)/f_r,1)$
 	\STATE \tab $C \gets C \cup \{v_i\}$
 	\STATE Assign $v_i$ the cluster center $c = \arg\min_{c \in C}\|v_i - c\|^2$.
@@ -362,10 +364,18 @@ While they are originally organized as classification benchmarks, we simply stri
 Some more information is given in Table~\ref{table1}. 
 For each dataset, ``nnz" gives to total number of non zero features in the dataset, $n$ the number of examples and $d$ the dimension of the problem.
 
+Feature engineering for the sake of online learning is one of the motivations for this work.
+For that reason, we apply standard stochastic gradient descent linear learning with the squared loss on these data.
+Once with the raw features and once with the $k$-means features added. 
+In some cases we see a small decrease in accuracy due to slower convergence of the learning on a larger feature set.
+This effect should theoretically be nullified in the presence of more data.
+In other case, however, we see a significant uptick in classification accuracy. This is agreement with the observations of Coates et al. \cite{CoatesNL11}.
+
+\newcommand{\ttt}[2]{ \parbox{#1pt}{\vspace{0.1cm} \noindent  #2 \vspace{0.1cm}}}
 \begin{table}[htdp]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|c|} \hline
-dataset		&	nnz		& $n$	&	$d$	&	before & after & sparse?			\\ \hline
+dataset		&	nnz		& $n$	&	$d$	& \ttt{70}{classification \\ accuracy  with  \\ raw features}  & \ttt{90}{classification \\ accuracy with added \\ $k$-means features}	& Sparse?		\\ \hline
 20news-binary	&	2.44E+6	&	1.88E+4	&	6.12E+4	& 0.9532	& 0.9510	& yes			\\ \hline %\cite{20news} 
 adult			&	5.86E+5	&	4.88E+4	&	1.04E+2	& 0.8527	& 0.8721	& yes			\\ \hline
 ijcnn1		&	3.22E+5	&	2.50E+4	&	2.10E+1	& 0.9167	& 0.9405	& no			\\ \hline %\cite{ijcnn1}
@@ -441,7 +451,7 @@ A surprising observation is that this ratio is almost constant for each dataset 
 
 The next experiment compares online $k$-means to $k$-means++.
 For every value of $k_{target}$ we ran online $k$-means to obtain both $f_{online}$ and $k_{actual}$.
-Then, we invoked $k$-means++ using $k_{actual}$ many clusters and computed its cost, $f_{kmpp}$.
+Then, we invoke $k$-means++ using $k_{actual}$ clusters and computed its cost, $f_{kmpp}$.
 This experiment was repeated $3$ times for each dataset and each value of $k_{target}$.
 The mean results are reported in Figure~\ref{fig4}. 
 Unsurprisingly, $k$-means++ is usually better in terms of cost. But, the reader should keep in mind that
@@ -470,11 +480,7 @@ The advantage of $k$-means++ (see Figure~\ref{fig4}) occurs when the clustering 
 \label{fig5}
 \end{center}
 \end{figure}
-
-
-\section{Conclusion}
- 
- 
+  
 \section{Aknowledgements}
 We would like to thank  Dean Foster for  helping us with the proof of the Lemma \ref{random}.
 
