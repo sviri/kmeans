@@ -46,11 +46,11 @@
 \title{Algorithm for Online K-Means Clustering}
 
 \author{
-	Edo Liberty \thanks{Yahoo Labs, New York, NY}
+	Edo Liberty \thanks{edo@yahoo-inc.com, Yahoo! Labs, New York, NY}
 		\and
-	Ram Sriharsha \thanks{Yahoo Labs, Sunnyvale, CA}
+	Ram Sriharsha \thanks{harshars@yahoo-inc.com, Yahoo! Labs, Sunnyvale, CA}
        		\and 
-	Maxim Sviridenko \thanks{Yahoo Labs, New York, NY}
+	Maxim Sviridenko \thanks{sviri@yahoo-inc.com, Yahoo Labs!, New York, NY}
 }
 
 
@@ -66,7 +66,7 @@ This paper shows that one can be competitive with with the $k$-means objective w
 In this model, the algorithm receives vectors $v_1,\ldots,v_n$ one by one in arbitrary order. 
 For each vector $v_i$ the algorithm outputs a cluster identifier before receiving $v_{i+1}$.
 Our online algorithm generates $\tilde{O}(k)$ clusters whose $k$-means cost is $\tilde{O}(W^*)$ where $W^*$ is the optimal $k$-means cost using $k$ clusters.\footnote{The notation $\tilde{O}(\cdot)$ depresses poly-logarithmic factors.}
-We also show that, experimentally, it is not much worse than $k$-means++   while operating in a strictly more constrained computational model.
+We also show that, experimentally, it is not much worse than $k$-means++ while operating in a strictly more constrained computational model.
 \end{abstract}
 \section{Introduction}
 
@@ -85,7 +85,7 @@ It gives a constant approximation ratio and is based on local search ideas popul
 %In the streaming model an algorithm has to process and discard a point after a small number of (typically one) passes. 
 In the standard streaming model the algorithm must consume the date in one pass and is allowed to keep only a small (typically constant or logarithmic) amount of information. 
 Nevertheless, it must output its final decisions when the stream has ended. For example, the location of the centers for $k$-means.
-Such model was considered by Ailon et al. \cite{AilonJM09}. In such a model, the best assignment of points to the centers chosen by the algorithm is only known in hindsight.
+Such model was considered by Ailon et al. \cite{AilonJM09} and Shindler et al. \cite{SWM}. In such a model, the best assignment of points to the centers chosen by the algorithm is only known in hindsight.
 
 In contrast, the online model of computation does not allow to postpone clustering decisions. 
 In this setting, an a priori unknown number of points arrive one by one in an arbitrary order.
@@ -146,7 +146,7 @@ As a convention, if $C = \emptyset$ then $D(v, C) = \infty$ for any $v$.
 \STATE $f_1 \gets w^*/k\log(n)$
 \FOR {$i \in 1,\ldots, n$}
 	\STATE {\bf with probability} $p_i = \min(D^2(v_i, C)/f_r,1)$
-	\STATE \tab $C \gets C \cup \{v_i\}$
+	\STATE \tab $C \gets C \cup \{v_i\}; q_r\gets q_r+1$
 	\IF {$q_r \ge 3 k (1+ \log_2 (n))$}
 		\STATE $r \gets r+1$;\;\;  $f_r \gets 2\cdot f_{r-1}$;\;\; $q_r \gets 0$
 	\ENDIF
@@ -168,7 +168,7 @@ As a convention, if $C = \emptyset$ then $D(v, C) = \infty$ for any $v$.
 \STATE $f_1 \gets  w^{*}/k$
 \FOR {$i \in k'+1, \ldots, n$}
 	\STATE {\bf with probability} $p_i = \min(D^2(v_i, C)/f_r,1)$
-	\STATE \tab $C \gets C \cup \{v_i\}$
+	\STATE \tab $C \gets C \cup \{v_i\}; q_r\gets q_r+1$
 	\STATE {\bf yield:} $c = \arg\min_{c \in C}\|v_i - c\|^2$
 	\IF {$q_r \ge 3 k (1+ \log_2 (i))$}
 		\STATE $r \gets r+1$;\;\;  $f_r \gets 2\cdot f_{r-1}$;\;\; $q_r \gets 0$
@@ -202,7 +202,7 @@ For any two vectors $v,v'\in S_{\tau,i}$  we have
 Let $c_{min}=f_1$ be the smallest non-zero squared distance between two vectors in our problem instance  and $c_{max}=\max_{i,\tau}\max_{v\in S_{\tau,i}} ||v-z_i||^2_2$ is the maximal distance between a vector and a cluster center in the optimal solution. Let $R$ denote the index of the last phase of our algorithm.
 First we estimate the expected number of clusters opened after certain phase.
 \begin{lemma}\label{expected}
-The expected number of clusters opened during phases $r',r'+1,\dots,R$  by the online or the semi-online versions of our algorithm is at most
+Consider an arbitrary phase $r'\ge 1$. The expected number of clusters opened during phases $r',r'+1,\dots,R$  by the online or the semi-online versions of our algorithm is at most
 $$k(1+\log_2n) +\frac{24W^*}{f_{r'}}.$$ 
 \end{lemma}
 \begin{proof}
@@ -231,13 +231,13 @@ $$p_2(r')= \sum_{\tau=0}^{\log_2 n}\sum_{r\ge r'}\frac{4\cdot 2^{\tau} A^*_i}{f_
 \end{proof}
 
 \begin{theorem}
-Let $q$ be the number of clusters defined by our algorithm (online or semi-online). Then $E[q]=O\left(k \log_2 n \log_2 \frac{n c_{max}}{c_{min}}\right)$.
+Let $q$ be the number of clusters defined by our algorithm (online or semi-online). Then $E[q]=O\left(k \log_2 n \log_2 \frac{W^*}{w^*}\right)$.
 \end{theorem}
 \begin{proof}
 Consider the first phase $r'$ of our algorithm when $$f_{r'}\ge \frac{W^*}{k\log_2 n}.$$
 The total number of clusters opened before phase $r'$ is upper bounded by $3k (1+\log_2 n)\log_2\frac{ f_{r'}}{f_1}$.
 Combining that with Lemma \ref{expected} we derive that the expected number of clusters opened by our online algorithm is at most 
-$$k(1+25\log_2 n) +3k(1+\log_2 n) \log_2\frac{ f_{r'}}{f_1}=O\left(k\log_2 n \log_2 \frac{n c_{max}}{c_{min}}\right).$$
+$$k(1+25\log_2 n) +3k(1+\log_2 n) \log_2\frac{ f_{r'}}{f_1}=O\left(k\log_2 n \log_2 \frac{W^*}{w^*}\right).$$
 
 \end{proof}
 
@@ -299,7 +299,7 @@ $$f_{r''}\ge \frac{72W^*}{k}.$$
 By Lemma \ref{expected1} the  number of clusters opened  during the  phase $r\ge r''$ is a sum of two random numbers
 $p_1(r)+p_2(r)$ where $p_1(r)\le k(1+\log_2n_{r})$ and 
 $$E[p_2(r)]\le \frac{24W^*}{f_{r}} \le \frac{k}{3\cdot 2^{r-r''}}.$$
-The algorithm can open   $3 k(1+\log_2n_r) $ clusters during round $r$ only if  $p_2(r'')\ge 2 k(1+\log_2n_r)>2k$. By Markov's inequality the probability to open  $3 k(1+\log_2n_r) $ clusters on iteration $r\ge r''$ is at most $\frac{1}{6\cdot 2^{r-r''}}\le \frac{1}{6}$.  
+The algorithm can open   $3 k(1+\log_2n_r) $ clusters during round $r$ only if  $p_2(r)\ge 2 k(1+\log_2n_r)>2k$. By Markov's inequality the probability to open  $3 k(1+\log_2n_r) $ clusters on iteration $r\ge r''$ is at most $\frac{1}{6\cdot 2^{r-r''}}\le \frac{1}{6}$.  
 
 By Lemma \ref{ring} the expected service costs for vectors in the ring $S_{\tau,i}$ is upper bounded by $f_R+ 4\cdot 2^{\tau}A_i^*\cdot |S_{\tau,i}|$. Summing up over all the rings we derive and upper bound of
 $f_Rk(1+\log n)+ 12W^*$.
@@ -328,7 +328,7 @@ E[f_R]&\le& p f_{r''-1} + (1-p)\sum_{r=r''}^{+\infty}f_r\cdot \frac56 \cdot \lef
 \subsection{Practical modifications to the algorithm}
 While experimenting with the algorithm, we discovered that some $\log$ factors were, in fact, too pessimistic in practice.
 We also had to make some pragmatic decisions about, for example, how to set the initial facility cost lower bound.
-As another practical adjustment we introduce the nation of $k_{target}$ and $k_{actual}$.
+As another practical adjustment we introduce the notion of $k_{target}$ and $k_{actual}$.
 The value of $k_{target}$ is the number of clusters we would like the algorithm to output while $k_{actual}$ is the actual number of clusters generated.
 Internally, the algorithm operates with a value of $k = \lceil(k_{target}-15)/5\rceil$. 
 This is a heuristic ad-hoc conversion that compensates for the $k_{actual}$ being larger that $k$ by design.
@@ -340,7 +340,7 @@ This is a heuristic ad-hoc conversion that compensates for the $k_{actual}$ bein
 \STATE $k \gets \lceil(k_{target}-15)/5\rceil$
 \STATE $k' \gets k+10$
 \FOR {$i \in 1,\ldots, k'$}
-	\STATE \tab $C \gets C \cup \{v_i\}$
+	\STATE \tab $C \gets C \cup \{v_i\}; q_r\gets q_r+1$
 \ENDFOR
 \STATE $D_{\min} = \{D^2(v_i,C \setminus \{i\}) | v_i \in C\}$
 \STATE $f_r\gets$ half the sum of the $k'-k$ smallest elements in $D_{\min}$.
@@ -359,7 +359,7 @@ This is a heuristic ad-hoc conversion that compensates for the $k_{actual}$ bein
 
 \subsection{Datasets}
 To evaluate our algorithm we executed it on $12$ different datasets.
-All the datasets that we used are conveniently aggregated on the Libsvm website \cite{libsvmData} and on the UCI dataset collection \cite{UCIdata}
+All the datasets that we used are conveniently aggregated on the Libsvm website \cite{libsvmData} and on the UCI dataset collection \cite{UCIdata}.
 While they are originally organized as classification benchmarks, we simply striped the label and used the vectors for clustering.
 Some more information is given in Table~\ref{table1}. 
 For each dataset, ``nnz" gives to total number of non zero features in the dataset, $n$ the number of examples and $d$ the dimension of the problem.
@@ -369,7 +369,7 @@ For that reason, we apply standard stochastic gradient descent linear learning w
 Once with the raw features and once with the $k$-means features added. 
 In some cases we see a small decrease in accuracy due to slower convergence of the learning on a larger feature set.
 This effect should theoretically be nullified in the presence of more data.
-In other case, however, we see a significant uptick in classification accuracy. This is agreement with the observations of Coates et al. \cite{CoatesNL11}.
+In other case, however, we see a significant uptick in classification accuracy. This is in agreement with the observations of Coates et al. \cite{CoatesNL11}.
 
 \newcommand{\ttt}[2]{ \parbox{#1pt}{\vspace{0.1cm} \noindent  #2 \vspace{0.1cm}}}
 \begin{table}[htdp]
@@ -486,39 +486,6 @@ We would like to thank  Dean Foster for  helping us with the proof of the Lemma 
 
 \bibliographystyle{plain}
 \bibliography{KMeans}
-
-
-
-
-
-\appendix
-
-
-
-
-\section{Online and Semi-Online Algorithms for $k$-means}\label{alg}
-
-Our algorithm will run in phases, the phases will be indexed by $r\ge 1$. On each phase  let $f_r$ denote the parameter used as a cost gauge for opening a new cluster. Initially $f_1$ is defined to be the smallest non-zero squared distance between two vectors in our problem instance and $f_r=2\cdot f_{r-1}$ for $r\ge 2$.
-The total number of demand points (or vectors) is $n$.  Each input vector is indexed by  $j=1,\dots,n$. 
-
-When a new vector $v_j\in R^m$ arrives the algorithm either decides to put it into an existing cluster or opens a new cluster centered at $z=v_j$. For $j=1$ the algorithm always opens the first cluster centered at $v_1$.
-
-When a new vector $v_j$ for $j\ge 2$ arrives, we run a generic step for the algorithm:
-
-\begin{enumerate}
-\item Let $C_1,\dots, C_q$ be the existing partition of the index set $\{1,\dots,j-1\}$ into clusters. Let $z_1,\dots,z_q$ be the corresponding cluster centers. Let $r\ge 1$ be the current phase of the algorithm. For each phase, let $q_r$ be the number of clusters opened during that phase. Note $q=\sum_{i=1}^rq_r$.
-\item Compute $d^2_j$ the squared Eucledian distance from the nearest cluster center to $v_j$, let $i(j)$ be the index of  the closest cluster center. 
-\item  Set
-$$p=\min \left\{\frac{d^2_j}{f_r},1\right\}$$ and define a Boolean random variable $Q$ with $E[Q]=p$.
-\item If $Q=1$ we  open a new cluster $C_{q+1}=\{v_j\}$ centered at $z_{q+1}=v_j$, increment $q=q+1$, $q_r=q_r+1$.  
-\item If $Q=0$ we assign vector $v_j$ into the cluster indexed by $i(j)$, i.e. $C_{i(j)}=C_{i(j)}\cup \{v_j\}$.
-\item 
-\begin{enumerate}
-\item In the semi-online algorithm: If $q_r\ge 3 k (1+ \log_2 n)$  we end the phase $r$ and move to the next one, i.e. $r=r+1$, the cluster cost is doubled and $q_{r}=0$.
-\item In the fully online algorithm: If $q_r\ge 3 k(1+  \log_2 j)$  we end the phase $r$ and move to the next one, i.e. $r=r+1$, the cluster cost is doubled and $q_{r}=0$.
-\end{enumerate}
-\end{enumerate}
-
 
 
 \end{document}
